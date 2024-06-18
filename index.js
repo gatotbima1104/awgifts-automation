@@ -13,7 +13,7 @@ puppeter.use(StealthPlugin());
 // Pull credential from .env
 const email = process.env.EMAIL;
 const password = process.env.PASSWORD;
-const credential_path = "./credential.json";
+const credential_path = "./credential_tomas.json";
 const spreadSheet_ID = process.env.SPREADSHEET_ID;
 const range_column = `${process.env.SHEET_NAME}!A:B`;
 const loginUrl = "https://www.awgifts.sk/login.sys";
@@ -71,20 +71,18 @@ async function loginPage(page, email, password, browser, loginUrl) {
       await setTimeout(1000);
 
       await page.type('input[type="email"]', email, {
-        delay: 200,
+        delay: 100,
       });
       await page.type('input[type="password"]', password, {
-        delay: 200,
+        delay: 100,
       });
       const loginSelector = "button#login_button";
       await page.click(loginSelector);
 
-      await setTimeout(2000);
+      await setTimeout(1000);
 
       try {
-        await page.waitForSelector("div.sweet-alert.showSweetAlert.visible", {
-          timeout: 3000,
-        });
+        await page.waitForSelector("div.sweet-alert.showSweetAlert.visible");
         consoleLog("CREDENTIALS ARE WRONG, PLEASE TRY AGAIN ....");
         await browser.close();
 
@@ -113,8 +111,17 @@ async function loginPage(page, email, password, browser, loginUrl) {
 }
 
 // Function addToChart Product
-async function addToChart(page, product, amountItem) {
+async function addToChart(page, product, amountItem, codeItem) {
   await page.goto(product, { waitUntil: "domcontentloaded" });
+
+  // Check if the order input element exists
+  const orderInput = await page.$("input.order_input");
+
+  if (!orderInput) {
+    consoleLog(`PRODUCT CODE \x1b[1m${codeItem}\x1b[0m IS SOLD OUT`);
+    return false;
+  }
+
   await page.type("input.order_input", amountItem);
 
   const orderSelector = "span.order_button";
@@ -149,7 +156,7 @@ async function loopProduct(page, codeItem, amountItem) {
       return false;
     }
 
-    const addToChartSuccessfully = await addToChart(page, product, amountItem);
+    const addToChartSuccessfully = await addToChart(page, product, amountItem, codeItem);
     if (addToChartSuccessfully) {
       consoleLog(
         `PRODUCT CODE w/ \x1b[1m${codeItem}\x1b[0m w/ AMOUNT \x1b[1m${amountItem}\x1b[0m AADDED SUCCESSFULLY`
