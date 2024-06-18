@@ -85,7 +85,7 @@ async function loginPage(page, email, password, browser, loginUrl) {
         await page.waitForSelector("div.sweet-alert.showSweetAlert.visible", {
           timeout: 3000,
         });
-        consoleLog("CREDENTIALS ARE WRONG");
+        consoleLog("CREDENTIALS ARE WRONG, PLEASE TRY AGAIN ....");
         await browser.close();
 
         return false;
@@ -177,7 +177,7 @@ async function loopProduct(page, codeItem, amountItem) {
 
     // configure browser
     const browser = await puppeter.launch({
-      headless: false,
+      headless: "new",
       args: [`--no-sandbox`],
     });
 
@@ -196,9 +196,9 @@ async function loopProduct(page, codeItem, amountItem) {
         //     consoleLog(`FAILED TO GO TO PRODUCT w/ CODE \x1b[1m${codeItem}\x1b[0m`);
         // }
       }
+      consoleLog("ALL PRODUCT LOADED SUCCESSFULLY !!!!");
     }
 
-    consoleLog("ALL PRODUCT LOADED SUCCESSFULLY !!!!");
     await browser.close();
   } catch (error) {
     console.log(error);
